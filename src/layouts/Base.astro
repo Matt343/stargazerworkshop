@@ -1,0 +1,110 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'stargazer workshop' } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonicalURL} />
+    <meta name="description" content={description} />
+    <title>{title} · stargazer workshop</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; }
+
+      :root {
+        --text: #1a1a1a;
+        --muted: #666;
+        --border: #ddd;
+        --bg: #fff;
+        --max-width: 720px;
+        --font-mono: 'Courier New', monospace;
+      }
+
+      body {
+        font-family: Georgia, 'Times New Roman', serif;
+        color: var(--text);
+        background: var(--bg);
+        margin: 0;
+        padding: 0 1rem;
+        line-height: 1.65;
+      }
+
+      a { color: inherit; }
+      a:hover { opacity: 0.7; }
+
+      .site-wrap {
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: 2rem 0 4rem;
+      }
+
+      header {
+        display: flex;
+        align-items: baseline;
+        gap: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 2.5rem;
+      }
+
+      header a { text-decoration: none; }
+
+      .site-name {
+        font-size: 1rem;
+        font-weight: normal;
+        font-style: italic;
+        margin: 0;
+      }
+
+      nav {
+        display: flex;
+        gap: 1.25rem;
+        font-size: 0.9rem;
+      }
+
+      nav a {
+        text-decoration: none;
+        color: var(--muted);
+      }
+
+      nav a:hover { color: var(--text); opacity: 1; }
+
+      footer {
+        margin-top: 4rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="site-wrap">
+      <header>
+        <p class="site-name"><a href="/">stargazer workshop</a></p>
+        <nav>
+          <a href="/blog">blog</a>
+          <a href="/ideas">ideas</a>
+          <a href="/art">art</a>
+        </nav>
+      </header>
+
+      <main>
+        <slot />
+      </main>
+
+      <footer>
+        <p>built with <a href="https://astro.build">astro</a> · deployed on <a href="https://pages.cloudflare.com">cloudflare pages</a></p>
+      </footer>
+    </div>
+  </body>
+</html>

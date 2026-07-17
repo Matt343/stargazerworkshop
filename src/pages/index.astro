@@ -1,0 +1,110 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+
+const ideas = (await getCollection('ideas'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+---
+
+<Base title="home">
+  <style>
+    h1 {
+      font-size: 1.5rem;
+      font-weight: normal;
+      margin: 0 0 0.5rem;
+    }
+
+    .intro {
+      color: var(--muted);
+      margin-bottom: 3rem;
+    }
+
+    section { margin-bottom: 3rem; }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .section-header h2 {
+      font-size: 0.85rem;
+      font-weight: normal;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 0;
+    }
+
+    .section-header a {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      margin-left: auto;
+    }
+
+    .post-list { list-style: none; padding: 0; margin: 0; }
+
+    .post-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      padding: 0.4rem 0;
+    }
+
+    .post-list a { text-decoration: none; }
+    .post-list a:hover { text-decoration: underline; }
+
+    .date {
+      font-size: 0.8rem;
+      color: var(--muted);
+      white-space: nowrap;
+      font-family: var(--font-mono);
+    }
+  </style>
+
+  <h1>hello.</h1>
+  <p class="intro">a place for projects, writing, ideas, and things i make.</p>
+
+  {posts.length > 0 && (
+    <section>
+      <div class="section-header">
+        <h2>recent posts</h2>
+        <a href="/blog">all posts →</a>
+      </div>
+      <ul class="post-list">
+        {posts.map(post => (
+          <li>
+            <a href={`/blog/${post.id}`}>{post.data.title}</a>
+            <span class="date">{post.data.date.toISOString().slice(0, 10)}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  {ideas.length > 0 && (
+    <section>
+      <div class="section-header">
+        <h2>recent ideas</h2>
+        <a href="/ideas">all ideas →</a>
+      </div>
+      <ul class="post-list">
+        {ideas.map(idea => (
+          <li>
+            <a href={`/ideas/${idea.id}`}>{idea.data.title}</a>
+            <span class="date">{idea.data.status}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+</Base>

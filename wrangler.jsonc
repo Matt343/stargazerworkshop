@@ -1,0 +1,57 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "stargazerworkshop",
+  "compatibility_date": "2026-07-17",
+  "compatibility_flags": ["global_fetch_strictly_public"],
+
+  // Entry point for the Cloudflare Worker (SSR handler).
+  // Static assets are served from ./dist via the ASSETS binding below.
+  "main": "@astrojs/cloudflare/entrypoints/server",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+
+  // Built-in observability — logs and traces visible in the CF dashboard
+  // without any code changes.
+  "observability": {
+    "enabled": true
+  }
+
+  // -------------------------------------------------------------------------
+  // Uncomment the blocks below as you need them.
+  // Run `wrangler types` after any change to regenerate worker-configuration.d.ts.
+  // -------------------------------------------------------------------------
+
+  // D1 database (SQLite at the edge — good for most small app persistence)
+  // First: `wrangler d1 create stargazerworkshop-db`
+  // Paste the database_id output below, then run `wrangler types`.
+  // , "d1_databases": [
+  //   {
+  //     "binding": "DB",
+  //     "database_name": "stargazerworkshop-db",
+  //     "database_id": "YOUR_DATABASE_ID_HERE"
+  //   }
+  // ]
+
+  // KV namespace (key-value — good for caching, sessions, feature flags)
+  // First: `wrangler kv namespace create CACHE`
+  // , "kv_namespaces": [
+  //   { "binding": "CACHE", "id": "YOUR_KV_ID_HERE" }
+  // ]
+
+  // R2 bucket (object storage — good for user uploads, large files)
+  // First: `wrangler r2 bucket create stargazerworkshop-uploads`
+  // , "r2_buckets": [
+  //   { "binding": "UPLOADS", "bucket_name": "stargazerworkshop-uploads" }
+  // ]
+
+  // Environment-specific overrides
+  // , "env": {
+  //   "production": {
+  //     "routes": [
+  //       { "pattern": "yourdomain.com/*", "zone_name": "yourdomain.com" }
+  //     ]
+  //   }
+  // }
+}
