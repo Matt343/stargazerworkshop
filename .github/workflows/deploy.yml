@@ -32,11 +32,13 @@ jobs:
       - name: Build
         run: pnpm build
 
-      # On PRs this creates a preview deployment.
-      # On push to main this deploys to production.
-      - name: Deploy to Cloudflare Pages
+      # Only deploy on pushes to main. PRs run the build above to catch errors
+      # but don't deploy. If you want PR preview URLs later, see:
+      # https://developers.cloudflare.com/workers/versions-and-deployments/preview-urls/
+      - name: Deploy to Cloudflare Workers
+        if: github.ref == 'refs/heads/main'
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy ./dist --project-name=stargazerworkshop --branch=${{ github.ref_name }}
+          command: deploy

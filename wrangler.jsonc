@@ -16,7 +16,11 @@
   // without any code changes.
   "observability": {
     "enabled": true
-  }
+  },
+
+  // Generates a unique preview URL for each deployment so you can verify
+  // what shipped before checking the live domain.
+  "preview_urls": true
 
   // -------------------------------------------------------------------------
   // Uncomment the blocks below as you need them.
