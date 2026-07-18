@@ -11,8 +11,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "sync": "astro sync",
     "check": "astro check",
-    "lint": "eslint .",
+    "lint": "astro sync && eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "generate-types": "wrangler types"
