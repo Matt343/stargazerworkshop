@@ -6,6 +6,7 @@ import { join, resolve } from 'node:path';
 import { parsePostBody } from './lib/parse-post';
 
 const POSTS_DIR = './src/content/posts';
+const TRACKS_DIR = './src/content/tracks';
 
 /** Strips a leading `---\n...\n---` YAML frontmatter block, returning the body. */
 function stripFrontmatter(raw: string): string {
@@ -22,6 +23,19 @@ function postFiles(dir: string): string[] {
 /** Post id from filename, e.g. `2026-07-17.md` -> `2026-07-17`. */
 function postId(file: string): string {
   return file.replace(/^.*\//, '').replace(/\.(md|mdx)$/, '');
+}
+
+/**
+ * Set of valid track slugs, derived from `tracks/*.yml` filenames — the same
+ * way the glob loader assigns track ids. Used to fail the build early on a
+ * typo'd or missing `## [track-slug]` reference.
+ */
+function trackSlugs(): Set<string> {
+  return new Set(
+    readdirSync(TRACKS_DIR)
+      .filter((f) => f.endsWith('.yml') || f.endsWith('.yaml'))
+      .map((f) => f.replace(/\.(yml|yaml)$/, '')),
+  );
 }
 
 /**
@@ -72,6 +86,8 @@ function updatesLoader(): Loader {
     name: 'updates-loader',
     async load({ store, renderMarkdown, parseData, generateDigest, watcher }: LoaderContext) {
       store.clear();
+      const validTracks = trackSlugs();
+      const unknown: Array<{ post: string; track: string; title: string }> = [];
       for (const file of postFiles(POSTS_DIR)) {
         const raw = readFileSync(file, 'utf-8');
         const post = postId(file);
@@ -79,6 +95,10 @@ function updatesLoader(): Loader {
         const frontmatter = meta.metadata?.frontmatter ?? {};
         const { updates } = parsePostBody(stripFrontmatter(raw));
         for (const update of updates) {
+          if (!validTracks.has(update.track)) {
+            unknown.push({ post, track: update.track, title: update.title });
+            continue;
+          }
           const id = `${post}__${String(update.order).padStart(2, '0')}-${update.track}`;
           const data = await parseData({
             id,
@@ -100,7 +120,18 @@ function updatesLoader(): Loader {
           });
         }
       }
+      if (unknown.length > 0) {
+        const lines = unknown
+          .map((u) => `  - posts/${u.post}.md: [${u.track}] "${u.title}"`)
+          .join('\n');
+        throw new Error(
+          `Unknown track slug(s) referenced in post updates. Create the ` +
+            `matching tracks/<slug>.yml or fix the heading:\n${lines}\n` +
+            `Known tracks: ${[...validTracks].sort().join(', ') || '(none)'}`,
+        );
+      }
       watcher?.add(resolve(POSTS_DIR));
+      watcher?.add(resolve(TRACKS_DIR));
     },
     schema: z.object({
       track: z.string(),
