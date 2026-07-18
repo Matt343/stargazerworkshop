@@ -2,27 +2,19 @@
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
-const posts = (await getCollection('blog', ({ data }) => !data.draft))
+const posts = (await getCollection('posts', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 3);
+  .slice(0, 5);
 
-const ideas = (await getCollection('ideas'))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 3);
+const activeTracks = (await getCollection('tracks'))
+  .filter((t) => t.data.status === 'active')
+  .sort((a, b) => a.data.name.localeCompare(b.data.name));
 ---
 
 <Base title="home">
   <style>
-    h1 {
-      font-size: 1.5rem;
-      font-weight: normal;
-      margin: 0 0 0.5rem;
-    }
-
-    .intro {
-      color: var(--muted);
-      margin-bottom: 3rem;
-    }
+    h1 { font-size: 1.5rem; font-weight: normal; margin: 0 0 0.5rem; }
+    .intro { color: var(--muted); margin-bottom: 3rem; }
 
     section { margin-bottom: 3rem; }
 
@@ -69,21 +61,33 @@ const ideas = (await getCollection('ideas'))
       white-space: nowrap;
       font-family: var(--font-mono);
     }
+
+    .tracks { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+    .track-chip {
+      font-size: 0.85rem;
+      text-decoration: none;
+      padding: 0.2rem 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+    }
+
+    .track-chip:hover { border-color: var(--text); opacity: 1; }
   </style>
 
   <h1>hello.</h1>
-  <p class="intro">a place for projects, writing, ideas, and things i make.</p>
+  <p class="intro">a running log of what i'm making, thinking about, and building.</p>
 
   {posts.length > 0 && (
     <section>
       <div class="section-header">
         <h2>recent posts</h2>
-        <a href="/blog">all posts →</a>
+        <a href="/posts">all posts →</a>
       </div>
       <ul class="post-list">
-        {posts.map(post => (
+        {posts.map((post) => (
           <li>
-            <a href={`/blog/${post.id}`}>{post.data.title}</a>
+            <a href={`/posts/${post.id}`}>{post.data.title}</a>
             <span class="date">{post.data.date.toISOString().slice(0, 10)}</span>
           </li>
         ))}
@@ -91,20 +95,17 @@ const ideas = (await getCollection('ideas'))
     </section>
   )}
 
-  {ideas.length > 0 && (
+  {activeTracks.length > 0 && (
     <section>
       <div class="section-header">
-        <h2>recent ideas</h2>
-        <a href="/ideas">all ideas →</a>
+        <h2>active tracks</h2>
+        <a href="/tracks">all tracks →</a>
       </div>
-      <ul class="post-list">
-        {ideas.map(idea => (
-          <li>
-            <a href={`/ideas/${idea.id}`}>{idea.data.title}</a>
-            <span class="date">{idea.data.status}</span>
-          </li>
+      <div class="tracks">
+        {activeTracks.map((track) => (
+          <a class="track-chip" href={`/tracks/${track.id}`}>{track.data.name}</a>
         ))}
-      </ul>
+      </div>
     </section>
   )}
 </Base>

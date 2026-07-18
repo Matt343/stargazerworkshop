@@ -1,0 +1,94 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const tracks = await getCollection('tracks');
+const updates = await getCollection('updates');
+
+const countByTrack = new Map<string, number>();
+const latestByTrack = new Map<string, Date>();
+for (const u of updates) {
+  countByTrack.set(u.data.track, (countByTrack.get(u.data.track) ?? 0) + 1);
+  const cur = latestByTrack.get(u.data.track);
+  if (!cur || u.data.date > cur) latestByTrack.set(u.data.track, u.data.date);
+}
+
+// Group by status; ideas sink to the bottom, active rises to the top.
+const order = ['active', 'paused', 'idea', 'complete'] as const;
+const grouped = order.map((status) => ({
+  status,
+  tracks: tracks
+    .filter((t) => t.data.status === status)
+    .sort((a, b) => {
+      const la = latestByTrack.get(a.id)?.valueOf() ?? 0;
+      const lb = latestByTrack.get(b.id)?.valueOf() ?? 0;
+      return lb - la || a.data.name.localeCompare(b.data.name);
+    }),
+})).filter((g) => g.tracks.length > 0);
+---
+
+<Base title="tracks">
+  <style>
+    h1 { font-size: 1.25rem; font-weight: normal; margin: 0 0 0.5rem; }
+    .description { color: var(--muted); font-size: 0.9rem; margin-bottom: 2.5rem; }
+
+    .group { margin-bottom: 2.5rem; }
+    .group-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin: 0 0 0.75rem;
+    }
+
+    .track-list { list-style: none; padding: 0; margin: 0; }
+    .track-item {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .track-item:first-child { border-top: 1px solid var(--border); }
+
+    .track-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+    }
+
+    .track-name { text-decoration: none; font-size: 1rem; }
+    .track-name:hover { text-decoration: underline; }
+
+    .track-count {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      white-space: nowrap;
+    }
+
+    .track-blurb { color: var(--muted); font-size: 0.85rem; margin: 0.25rem 0 0; }
+
+    .empty { color: var(--muted); font-style: italic; }
+  </style>
+
+  <h1>tracks</h1>
+  <p class="description">ongoing projects and themes. an idea is just a track that hasn't gone anywhere yet.</p>
+
+  {grouped.length > 0 ? grouped.map((group) => (
+    <div class="group">
+      <p class="group-label">{group.status}</p>
+      <ul class="track-list">
+        {group.tracks.map((track) => (
+          <li class="track-item">
+            <div class="track-head">
+              <a class="track-name" href={`/tracks/${track.id}`}>{track.data.name}</a>
+              <span class="track-count">
+                {countByTrack.get(track.id) ?? 0} {(countByTrack.get(track.id) ?? 0) === 1 ? 'update' : 'updates'}
+              </span>
+            </div>
+            {track.data.blurb && <p class="track-blurb">{track.data.blurb}</p>}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )) : <p class="empty">nothing here yet.</p>}
+</Base>
