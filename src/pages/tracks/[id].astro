@@ -14,7 +14,9 @@ export async function getStaticPaths() {
       // Track story in isolation: newest update first.
       updates: updates
         .filter((u) => u.data.track === track.id)
-        .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf() || b.data.order - a.data.order),
+        .sort(
+          (a, b) => b.data.date.valueOf() - a.data.date.valueOf() || b.data.order - a.data.order,
+        ),
     },
   }));
 }
@@ -24,7 +26,12 @@ const { track, updates } = Astro.props;
 
 <Base title={track.data.name} description={track.data.blurb}>
   <style>
-    h1 { font-size: 1.75rem; font-weight: normal; margin: 0 0 0.75rem; line-height: 1.3; }
+    h1 {
+      font-size: 1.75rem;
+      font-weight: normal;
+      margin: 0 0 0.75rem;
+      line-height: 1.3;
+    }
 
     .meta {
       font-size: 0.85rem;
@@ -36,15 +43,35 @@ const { track, updates } = Astro.props;
       align-items: center;
     }
 
-    .status { padding: 0.15rem 0.5rem; border: 1px solid var(--border); border-radius: 2px; font-size: 0.75rem; }
+    .status {
+      padding: 0.15rem 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      font-size: 0.75rem;
+    }
 
-    .blurb { color: var(--muted); margin: 0 0 2.5rem; }
+    .blurb {
+      color: var(--muted);
+      margin: 0 0 2.5rem;
+    }
 
-    .empty { color: var(--muted); font-style: italic; margin-top: 2rem; }
+    .empty {
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 2rem;
+    }
 
-    .back { margin-top: 3rem; font-size: 0.85rem; }
-    .back a { color: var(--muted); text-decoration: none; }
-    .back a:hover { color: var(--text); }
+    .back {
+      margin-top: 3rem;
+      font-size: 0.85rem;
+    }
+    .back a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .back a:hover {
+      color: var(--text);
+    }
   </style>
 
   <h1>{track.data.name}</h1>
@@ -56,11 +83,13 @@ const { track, updates } = Astro.props;
 
   {track.data.blurb && <p class="blurb">{track.data.blurb}</p>}
 
-  {updates.length > 0 ? (
-    updates.map((update) => <Update update={update} context="track" />)
-  ) : (
-    <p class="empty">no updates yet — this track is still just an idea.</p>
-  )}
+  {
+    updates.length > 0 ? (
+      updates.map((update) => <Update update={update} context="track" />)
+    ) : (
+      <p class="empty">no updates yet — this track is still just an idea.</p>
+    )
+  }
 
   <div class="back"><a href="/tracks">← all tracks</a></div>
 </Base>

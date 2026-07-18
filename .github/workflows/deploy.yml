@@ -7,12 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  deploy:
+  check:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      deployments: write
-
     steps:
       - uses: actions/checkout@v7
 
@@ -29,10 +25,43 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Formatting
+        run: pnpm format:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type check
+        run: pnpm check
+
+  deploy:
+    # Only deploy if checks pass. PRs run `check` but never reach deploy
+    # (the step is gated on the main branch below).
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Build
         run: pnpm build
 
-      # Only deploy on pushes to main. PRs run the build above to catch errors
+      # Only deploy on pushes to main. PRs run check + build to catch errors
       # but don't deploy. If you want PR preview URLs later, see:
       # https://developers.cloudflare.com/workers/versions-and-deployments/preview-urls/
       - name: Deploy to Cloudflare Workers

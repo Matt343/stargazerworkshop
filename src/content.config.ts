@@ -53,7 +53,7 @@ function postsLoader(): Loader {
         const id = postId(file);
         // renderMarkdown parses frontmatter for us (no YAML dep needed).
         const meta = await renderMarkdown(raw);
-        const frontmatter = meta.metadata?.frontmatter ?? {};
+        const frontmatter = (meta.metadata?.frontmatter ?? {}) as Record<string, unknown>;
         const { intro } = parsePostBody(stripFrontmatter(raw));
         const data = await parseData({ id, data: frontmatter });
         const rendered = await renderMarkdown(intro);
@@ -67,14 +67,15 @@ function postsLoader(): Loader {
       }
       watcher?.add(resolve(POSTS_DIR));
     },
-    schema: z.object({
-      title: z.string(),
-      date: z.coerce.date(),
-      draft: z.boolean().default(false),
-      tags: z.array(z.string()).default([]),
-    }),
   };
 }
+
+const postSchema = z.object({
+  title: z.string(),
+  date: z.coerce.date(),
+  draft: z.boolean().default(false),
+  tags: z.array(z.string()).default([]),
+});
 
 /**
  * Loads each `## [track] Title` section of every post as its own `updates`
@@ -92,7 +93,7 @@ function updatesLoader(): Loader {
         const raw = readFileSync(file, 'utf-8');
         const post = postId(file);
         const meta = await renderMarkdown(raw);
-        const frontmatter = meta.metadata?.frontmatter ?? {};
+        const frontmatter = (meta.metadata?.frontmatter ?? {}) as Record<string, unknown>;
         const { updates } = parsePostBody(stripFrontmatter(raw));
         for (const update of updates) {
           if (!validTracks.has(update.track)) {
@@ -133,18 +134,19 @@ function updatesLoader(): Loader {
       watcher?.add(resolve(POSTS_DIR));
       watcher?.add(resolve(TRACKS_DIR));
     },
-    schema: z.object({
-      track: z.string(),
-      title: z.string(),
-      post: z.string(),
-      date: z.coerce.date(),
-      order: z.number(),
-    }),
   };
 }
 
-const posts = defineCollection({ loader: postsLoader() });
-const updates = defineCollection({ loader: updatesLoader() });
+const updateSchema = z.object({
+  track: z.string(),
+  title: z.string(),
+  post: z.string(),
+  date: z.coerce.date(),
+  order: z.number(),
+});
+
+const posts = defineCollection({ loader: postsLoader(), schema: postSchema });
+const updates = defineCollection({ loader: updatesLoader(), schema: updateSchema });
 
 /**
  * Tracks are ongoing projects / themes. An "idea" is just a track with

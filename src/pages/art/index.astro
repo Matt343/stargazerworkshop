@@ -2,13 +2,18 @@
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
-const pieces = (await getCollection('art'))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const pieces = (await getCollection('art')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
 ---
 
 <Base title="art">
   <style>
-    h1 { font-size: 1.25rem; font-weight: normal; margin: 0 0 2rem; }
+    h1 {
+      font-size: 1.25rem;
+      font-weight: normal;
+      margin: 0 0 2rem;
+    }
 
     .gallery {
       display: grid;
@@ -16,7 +21,10 @@ const pieces = (await getCollection('art'))
       gap: 1.5rem;
     }
 
-    .piece a { display: block; text-decoration: none; }
+    .piece a {
+      display: block;
+      text-decoration: none;
+    }
 
     .piece img {
       width: 100%;
@@ -26,36 +34,52 @@ const pieces = (await getCollection('art'))
       background: #f5f5f5;
     }
 
-    .piece-info { padding: 0.5rem 0 0; }
-    .piece-title { font-size: 0.9rem; margin: 0 0 0.2rem; }
-    .piece-meta { font-size: 0.75rem; color: var(--muted); font-family: var(--font-mono); }
+    .piece-info {
+      padding: 0.5rem 0 0;
+    }
+    .piece-title {
+      font-size: 0.9rem;
+      margin: 0 0 0.2rem;
+    }
+    .piece-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-family: var(--font-mono);
+    }
 
-    .empty { color: var(--muted); font-style: italic; }
+    .empty {
+      color: var(--muted);
+      font-style: italic;
+    }
   </style>
 
   <h1>art</h1>
 
-  {pieces.length > 0 ? (
-    <div class="gallery">
-      {pieces.map((piece) => (
-        <div class="piece">
-          <a href={`/${piece.data.image}`} target="_blank" rel="noopener">
-            <img src={`/${piece.data.image}`} alt={piece.data.title} loading="lazy" />
-          </a>
-          <div class="piece-info">
-            <p class="piece-title">{piece.data.title}</p>
-            <p class="piece-meta">
-              {piece.data.medium && <span>{piece.data.medium} · </span>}
-              {piece.data.date.toISOString().slice(0, 10)}
-            </p>
-            {piece.data.description && (
-              <p style="font-size: 0.8rem; color: var(--muted); margin: 0.25rem 0 0;">{piece.data.description}</p>
-            )}
+  {
+    pieces.length > 0 ? (
+      <div class="gallery">
+        {pieces.map((piece) => (
+          <div class="piece">
+            <a href={`/${piece.data.image}`} target="_blank" rel="noopener">
+              <img src={`/${piece.data.image}`} alt={piece.data.title} loading="lazy" />
+            </a>
+            <div class="piece-info">
+              <p class="piece-title">{piece.data.title}</p>
+              <p class="piece-meta">
+                {piece.data.medium && <span>{piece.data.medium} · </span>}
+                {piece.data.date.toISOString().slice(0, 10)}
+              </p>
+              {piece.data.description && (
+                <p style="font-size: 0.8rem; color: var(--muted); margin: 0.25rem 0 0;">
+                  {piece.data.description}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
-  ) : (
-    <p class="empty">nothing here yet.</p>
-  )}
+        ))}
+      </div>
+    ) : (
+      <p class="empty">nothing here yet.</p>
+    )
+  }
 </Base>

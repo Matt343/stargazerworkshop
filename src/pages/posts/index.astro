@@ -2,8 +2,9 @@
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
-const posts = (await getCollection('posts', ({ data }) => !data.draft))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
 
 // Count updates per post so the listing hints at how much is inside.
 const updates = await getCollection('updates');
@@ -15,9 +16,17 @@ for (const u of updates) {
 
 <Base title="posts">
   <style>
-    h1 { font-size: 1.25rem; font-weight: normal; margin: 0 0 2rem; }
+    h1 {
+      font-size: 1.25rem;
+      font-weight: normal;
+      margin: 0 0 2rem;
+    }
 
-    .post-list { list-style: none; padding: 0; margin: 0; }
+    .post-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
 
     .post-list li {
       display: flex;
@@ -28,10 +37,16 @@ for (const u of updates) {
       border-bottom: 1px solid var(--border);
     }
 
-    .post-list li:first-child { border-top: 1px solid var(--border); }
+    .post-list li:first-child {
+      border-top: 1px solid var(--border);
+    }
 
-    .post-title { text-decoration: none; }
-    .post-title:hover { text-decoration: underline; }
+    .post-title {
+      text-decoration: none;
+    }
+    .post-title:hover {
+      text-decoration: underline;
+    }
 
     .meta {
       display: flex;
@@ -43,24 +58,31 @@ for (const u of updates) {
       white-space: nowrap;
     }
 
-    .empty { color: var(--muted); font-style: italic; }
+    .empty {
+      color: var(--muted);
+      font-style: italic;
+    }
   </style>
 
   <h1>posts</h1>
 
-  {posts.length > 0 ? (
-    <ul class="post-list">
-      {posts.map((post) => (
-        <li>
-          <a class="post-title" href={`/posts/${post.id}`}>{post.data.title}</a>
-          <span class="meta">
-            {countByPost.get(post.id) ? <span>{countByPost.get(post.id)} updates</span> : null}
-            <span>{post.data.date.toISOString().slice(0, 10)}</span>
-          </span>
-        </li>
-      ))}
-    </ul>
-  ) : (
-    <p class="empty">nothing here yet.</p>
-  )}
+  {
+    posts.length > 0 ? (
+      <ul class="post-list">
+        {posts.map((post) => (
+          <li>
+            <a class="post-title" href={`/posts/${post.id}`}>
+              {post.data.title}
+            </a>
+            <span class="meta">
+              {countByPost.get(post.id) ? <span>{countByPost.get(post.id)} updates</span> : null}
+              <span>{post.data.date.toISOString().slice(0, 10)}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="empty">nothing here yet.</p>
+    )
+  }
 </Base>

@@ -13,10 +13,19 @@ const activeTracks = (await getCollection('tracks'))
 
 <Base title="home">
   <style>
-    h1 { font-size: 1.5rem; font-weight: normal; margin: 0 0 0.5rem; }
-    .intro { color: var(--muted); margin-bottom: 3rem; }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: normal;
+      margin: 0 0 0.5rem;
+    }
+    .intro {
+      color: var(--muted);
+      margin-bottom: 3rem;
+    }
 
-    section { margin-bottom: 3rem; }
+    section {
+      margin-bottom: 3rem;
+    }
 
     .section-header {
       display: flex;
@@ -42,7 +51,11 @@ const activeTracks = (await getCollection('tracks'))
       margin-left: auto;
     }
 
-    .post-list { list-style: none; padding: 0; margin: 0; }
+    .post-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
 
     .post-list li {
       display: flex;
@@ -52,8 +65,12 @@ const activeTracks = (await getCollection('tracks'))
       padding: 0.4rem 0;
     }
 
-    .post-list a { text-decoration: none; }
-    .post-list a:hover { text-decoration: underline; }
+    .post-list a {
+      text-decoration: none;
+    }
+    .post-list a:hover {
+      text-decoration: underline;
+    }
 
     .date {
       font-size: 0.8rem;
@@ -62,7 +79,11 @@ const activeTracks = (await getCollection('tracks'))
       font-family: var(--font-mono);
     }
 
-    .tracks { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .tracks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
 
     .track-chip {
       font-size: 0.85rem;
@@ -72,40 +93,49 @@ const activeTracks = (await getCollection('tracks'))
       border-radius: 2px;
     }
 
-    .track-chip:hover { border-color: var(--text); opacity: 1; }
+    .track-chip:hover {
+      border-color: var(--text);
+      opacity: 1;
+    }
   </style>
 
   <h1>hello.</h1>
   <p class="intro">a running log of what i'm making, thinking about, and building.</p>
 
-  {posts.length > 0 && (
-    <section>
-      <div class="section-header">
-        <h2>recent posts</h2>
-        <a href="/posts">all posts →</a>
-      </div>
-      <ul class="post-list">
-        {posts.map((post) => (
-          <li>
-            <a href={`/posts/${post.id}`}>{post.data.title}</a>
-            <span class="date">{post.data.date.toISOString().slice(0, 10)}</span>
-          </li>
-        ))}
-      </ul>
-    </section>
-  )}
+  {
+    posts.length > 0 && (
+      <section>
+        <div class="section-header">
+          <h2>recent posts</h2>
+          <a href="/posts">all posts →</a>
+        </div>
+        <ul class="post-list">
+          {posts.map((post) => (
+            <li>
+              <a href={`/posts/${post.id}`}>{post.data.title}</a>
+              <span class="date">{post.data.date.toISOString().slice(0, 10)}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
 
-  {activeTracks.length > 0 && (
-    <section>
-      <div class="section-header">
-        <h2>active tracks</h2>
-        <a href="/tracks">all tracks →</a>
-      </div>
-      <div class="tracks">
-        {activeTracks.map((track) => (
-          <a class="track-chip" href={`/tracks/${track.id}`}>{track.data.name}</a>
-        ))}
-      </div>
-    </section>
-  )}
+  {
+    activeTracks.length > 0 && (
+      <section>
+        <div class="section-header">
+          <h2>active tracks</h2>
+          <a href="/tracks">all tracks →</a>
+        </div>
+        <div class="tracks">
+          {activeTracks.map((track) => (
+            <a class="track-chip" href={`/tracks/${track.id}`}>
+              {track.data.name}
+            </a>
+          ))}
+        </div>
+      </section>
+    )
+  }
 </Base>
